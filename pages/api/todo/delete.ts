@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import connectToDatabase from "../../../services/DatabaseConnection";
+import connectToDatabase from "../../../utils/DatabaseConnection";
 
 export default async (req: VercelRequest, res: VercelResponse) => {
   const { title } = req.query;
