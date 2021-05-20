@@ -5,10 +5,8 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import { red } from "@material-ui/core/colors";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
-import Avatar from "@material-ui/core/Avatar";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import IconButton from "@material-ui/core/IconButton";
@@ -51,9 +49,19 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+interface TodoProps {
+  _id: string;
+  title: string;
+  description: string;
+}
+
 interface CardProps {
   title?: string;
   description?: string;
+  todo: TodoProps;
+  onDeleteTodo?: (todo: TodoProps) => void;
+  editTodo?: (todo: TodoProps) => void;
+  handleOpen?: () => void;
 }
 
 const TodoCard = React.memo((props: CardProps) => {
@@ -61,6 +69,25 @@ const TodoCard = React.memo((props: CardProps) => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
+
+  const deleteTodo = async (todo) => {
+    setOpen(false);
+
+    const requestOptions = {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ _id: todo._id }),
+    };
+
+    if (window.confirm(`Você tem certeza que deseja deletar "${todo.title}"`)) {
+      fetch(
+        `http://localhost:3000/api/todo/delete/${todo._id}`,
+        requestOptions
+      ).then((response) => {
+        props.onDeleteTodo(todo);
+      });
+    }
+  };
 
   return (
     <Card className={classes.root}>
@@ -86,8 +113,25 @@ const TodoCard = React.memo((props: CardProps) => {
               open={open}
               onClose={(event) => setOpen(false)}
             >
-              <MenuItem key="edit">Editar</MenuItem>
-              <MenuItem key="delete">Excluir</MenuItem>
+              <MenuItem
+                key="edit"
+                onClick={(event) => {
+                  setOpen(false);
+                  props.handleOpen();
+                  props.editTodo(props.todo);
+                }}
+              >
+                Editar
+              </MenuItem>
+              <MenuItem
+                key="delete"
+                onClick={(event) => {
+                  setOpen(false);
+                  deleteTodo(props.todo);
+                }}
+              >
+                Excluir
+              </MenuItem>
             </Menu>
           </>
         }

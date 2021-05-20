@@ -13,3 +13,17 @@
     margin-bottom: 10px;
   }
 }
+
+.modal {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fab {
+  position: fixed !important;
+  z-index: 9999;
+  bottom: 20px;
+  right: 20px;
+}

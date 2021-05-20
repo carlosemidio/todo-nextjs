@@ -7,12 +7,15 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   const db = await connectToDatabase(process.env.MONGODB_URI);
   const collection = await db.collection("todo");
 
-  const todo = await collection.insertOne({
-    title,
-    description,
-    finalized,
-    createdAt: new Date(),
-  });
-
-  res.status(200).json({ todo: todo });
+  await collection.insertOne(
+    {
+      title,
+      description,
+      finalized,
+      createdAt: new Date(),
+    },
+    function (err, docsInserted) {
+      res.status(200).json({ todo: docsInserted.ops[0] });
+    }
+  );
 };

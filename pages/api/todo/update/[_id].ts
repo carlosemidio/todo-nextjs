@@ -1,14 +1,16 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import connectToDatabase from "../../../utils/DatabaseConnection";
+import { ObjectId } from "bson";
+import connectToDatabase from "../../../../utils/DatabaseConnection";
 
 export default async (req: VercelRequest, res: VercelResponse) => {
+  const { _id } = req.query;
   const { title, description, finalized } = req.body;
 
   const db = await connectToDatabase(process.env.MONGODB_URI);
   const collection = db.collection("todo");
 
   const todo = await collection.findOneAndUpdate(
-    { title: title },
+    { _id: ObjectId(_id) },
     {
       $set: {
         title,
@@ -19,5 +21,5 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     { upsert: true, returnOriginal: false }
   );
 
-  res.status(200).json({ todo: todo });
+  res.status(200).json({ todo: todo.value });
 };
